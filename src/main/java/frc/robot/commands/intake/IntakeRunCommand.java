@@ -2,34 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.tank;
+package frc.robot.commands.intake;
 
-import frc.robot.subsystems.TankDriveSubsystem;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import frc.robot.subsystems.IntakeSubsystem;
+
+import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
-public class ArcadeTankDriveCommand extends CommandBase {
-  private final TankDriveSubsystem m_subsystem;
-  private Joystick joystick;
-
-  private boolean speedControl;
+public class IntakeRunCommand extends CommandBase {
+  private final IntakeSubsystem m_subsystem;
+  private DoubleSupplier speed;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ArcadeTankDriveCommand(TankDriveSubsystem subsystem, Joystick joystick, boolean speedControl) {
+  public IntakeRunCommand(IntakeSubsystem subsystem, DoubleSupplier speed) {
     m_subsystem = subsystem;
-    this.joystick = joystick;
-    this.speedControl = speedControl;
+    this.speed = speed;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-  }
+  }  
 
   // Called when the command is initially scheduled.
   @Override
@@ -39,17 +35,7 @@ public class ArcadeTankDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double turbo = 1.0;
-
-    if(speedControl) {
-        double chosenTrigger = Math.abs(joystick.getThrottle());
-
-        turbo = 1.0 - chosenTrigger * 0.5;
-    }
-    
-    //m_subsystem.getDifferentialDrive().arcadeDrive(-joystick.getX() * turbo, -joystick.getY() * turbo);
-
-    m_subsystem.getDifferentialDrive().arcadeDrive(-joystick.getX() * turbo, -joystick.getY() * turbo);
+    m_subsystem.getIntake().set(speed.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.tank.ArcadeTankDriveCommand;
 import frc.robot.commands.arm.ArmDriveCommand;
+import frc.robot.commands.arm.ArmGoToPositionCommand;
 import frc.robot.commands.intake.IntakeGrabCommand;
 import frc.robot.commands.intake.IntakeReleaseCommand;
 import frc.robot.commands.intake.IntakeStopCommand;
@@ -58,6 +59,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     SmartDashboard.putNumber("Gyro", m_robotContainer.tankDriveSubsystem.getAngle());
+    SmartDashboard.putNumber("Arm Encoder", m_robotContainer.armEncoder.get());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -96,18 +98,14 @@ public class Robot extends TimedRobot {
     }
 
     CommandScheduler.getInstance().schedule(new ArcadeTankDriveCommand(m_robotContainer.tankDriveSubsystem, m_robotContainer.joystick, true));
-    CommandScheduler.getInstance().schedule(new ArmDriveCommand(m_robotContainer.armSubsystem, () -> {
-      if(m_robotContainer.joystick.getPOV() == 0) {
-        return 0.5;
-      } else if(m_robotContainer.joystick.getPOV() == 180) {
-        return -0.5;
-      } else {
-        return 0;
-      }
-    }));
+    m_robotContainer.armSubsystem.setDefaultCommand(new ArmDriveCommand(m_robotContainer.armSubsystem, () -> -m_robotContainer.gamepad.getLeftY()));
 
-    Trigger aButton = new Trigger(() -> m_robotContainer.joystick.getRawButton(1));
-    Trigger bButton = new Trigger(() -> m_robotContainer.joystick.getRawButton(2));
+    Trigger aButton = new Trigger(() -> m_robotContainer.gamepad.getAButton());
+    Trigger bButton = new Trigger(() -> m_robotContainer.gamepad.getBButton());
+
+    Trigger armAutoUpButton = new Trigger(() -> m_robotContainer.gamepad.getPOV() == 0);
+    Trigger armAutoMiddleButton = new Trigger(() -> m_robotContainer.gamepad.getPOV() == 90);
+    Trigger armAutoSaveButton = new Trigger(() -> m_robotContainer.gamepad.getPOV() == 180);
 
     aButton
       .onTrue(new IntakeGrabCommand(m_robotContainer.intakeSubsystem))
@@ -116,6 +114,10 @@ public class Robot extends TimedRobot {
     bButton
       .onTrue(new IntakeReleaseCommand(m_robotContainer.intakeSubsystem))
       .onFalse(new IntakeStopCommand(m_robotContainer.intakeSubsystem));
+
+    armAutoUpButton.onTrue(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 14000));
+    armAutoMiddleButton.onTrue(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 8000));
+    armAutoSaveButton.onTrue(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 100, () -> 0.2));
   }
 
   /** This function is called periodically during operator control. */
@@ -127,6 +129,10 @@ public class Robot extends TimedRobot {
       m_robotContainer.solenoid.set(Value.kReverse);
     } else if(m_robotContainer.joystick.getRawButtonPressed(10)) {
       m_robotContainer.solenoid.set(Value.kForward);
+    }
+
+    if(m_robotContainer.joystick.getPOV() != -1 && m_robotContainer.armSubsystem.getCurrentCommand() != m_robotContainer.armSubsystem.getDefaultCommand()) {
+      m_robotContainer.armSubsystem.getCurrentCommand().cancel();
     }
   }
 

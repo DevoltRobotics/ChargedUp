@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.arm;
+package frc.robot.commands.intake;
 
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /** An example command that uses an example subsystem. */
-public class ArmDriveCommand extends CommandBase {
-  private final ArmSubsystem m_subsystem;
+public class IntakeNZRunCommand extends CommandBase {
+  private final IntakeSubsystem m_subsystem;
   private DoubleSupplier speed;
 
   /**
@@ -20,7 +19,7 @@ public class ArmDriveCommand extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ArmDriveCommand(ArmSubsystem subsystem, DoubleSupplier speed) {
+  public IntakeNZRunCommand(IntakeSubsystem subsystem, DoubleSupplier speed) {
     m_subsystem = subsystem;
     this.speed = speed;
 
@@ -36,17 +35,7 @@ public class ArmDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(Math.abs(speed.getAsDouble()) >= 0.1) {
-      CommandScheduler.getInstance().schedule(new ArmDownReleaseCommand(m_subsystem));
-    }
-
-    var speedValue = speed.getAsDouble();
-    
-    if(speedValue < 0 && m_subsystem.getEncoder().get() <= -100) {
-      speedValue = 0;
-    }
-
-    m_subsystem.getArm().set(speedValue);
+    m_subsystem.getIntake().set(speed.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
@@ -57,6 +46,6 @@ public class ArmDriveCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

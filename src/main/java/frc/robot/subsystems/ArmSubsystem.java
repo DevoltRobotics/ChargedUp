@@ -4,7 +4,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.arm.ArmDownReleaseCommand;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -25,13 +27,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(encoder.get() <= 300 && lock) {
-        armDownLockLeft.set(0.3);
-        armDownLockRight.set(0.4);
-    } else {
-        armDownLockLeft.set(0.0);
-        armDownLockRight.set(0.7);
-    }
   }
 
   @Override
@@ -41,6 +36,14 @@ public class ArmSubsystem extends SubsystemBase {
 
   public MotorController getArm() {
     return arm;
+  }
+  
+  public Servo getArmDownLockLeft() {
+    return armDownLockLeft;
+  }
+  
+  public Servo getArmDownLockRight() {
+    return armDownLockRight;
   }
 
   public Encoder getEncoder() {

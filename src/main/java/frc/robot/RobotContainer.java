@@ -38,6 +38,8 @@ public class RobotContainer {
   MotorControllerGroup left = new MotorControllerGroup(new CANSparkMax(3, CANSparkMax.MotorType.kBrushed), new CANSparkMax(4, CANSparkMax.MotorType.kBrushed));
   MotorControllerGroup right = new MotorControllerGroup(new CANSparkMax(5, CANSparkMax.MotorType.kBrushed), new CANSparkMax(6, CANSparkMax.MotorType.kBrushed));
 
+  Encoder leftEncoder = new Encoder(0, 1);
+
   MotorControllerGroup arm = new MotorControllerGroup(new CANSparkMax(7, CANSparkMax.MotorType.kBrushed), new CANSparkMax(8, CANSparkMax.MotorType.kBrushed));
 
   Servo armDownLockLeft = new Servo(8);
@@ -47,19 +49,14 @@ public class RobotContainer {
 
   CANSparkMax intake = new CANSparkMax(9, CANSparkMax.MotorType.kBrushless);
 
-  SPI.Port gyroPort = SPI.Port.kMXP;
-
-  ADXRS450_Gyro gyro = new ADXRS450_Gyro(gyroPort);
+  AnalogGyro gyro = new AnalogGyro(0);
 
   Joystick joystick = new Joystick(1);
   XboxController gamepad = new XboxController(0);
 
-  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, gyro);
+  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, gyro, leftEncoder);
   ArmSubsystem armSubsystem = new ArmSubsystem(arm, armEncoder, armDownLockLeft, armDownLockRight);
-  IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intake);
-
-  public Command getAutonomousCommand() {
-    return null;
-  }
+  
+  IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intake, solenoid);
 
 }

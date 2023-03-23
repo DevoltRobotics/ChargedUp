@@ -1,28 +1,19 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands.intake;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 
-import java.util.function.DoubleSupplier;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
-/** An example command that uses an example subsystem. */
-public class IntakeRunCommand extends CommandBase {
+public class IntakeClawOpenCommand extends CommandBase {
   private final IntakeSubsystem m_subsystem;
-  private DoubleSupplier speed;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public IntakeRunCommand(IntakeSubsystem subsystem, DoubleSupplier speed) {
+  public IntakeClawOpenCommand(IntakeSubsystem subsystem) {
     m_subsystem = subsystem;
-    this.speed = speed;
-
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }  
@@ -35,18 +26,17 @@ public class IntakeRunCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.getIntake().set(speed.getAsDouble());
+    m_subsystem.getClawSolenoid().set(DoubleSolenoid.Value.kReverse);
+    cancel();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_subsystem.getIntake().set(0.0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

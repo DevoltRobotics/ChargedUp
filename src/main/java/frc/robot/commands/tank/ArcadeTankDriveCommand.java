@@ -8,6 +8,7 @@ import frc.robot.subsystems.TankDriveSubsystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
@@ -42,9 +43,19 @@ public class ArcadeTankDriveCommand extends CommandBase {
     double turbo = 1.0;
 
     if(speedControl) {
-        double chosenTrigger = Math.abs(joystick.getThrottle());
+        double chosenTrigger = joystick.getThrottle();
+
+        if(chosenTrigger > 0) {
+          chosenTrigger = 0.5 + (chosenTrigger / 2);
+        } else {
+          chosenTrigger = 0.5 - Math.abs(chosenTrigger / 2);
+        }
 
         turbo = 1.0 - chosenTrigger * 0.5;
+
+
+        SmartDashboard.putNumber("turbo", turbo);
+        SmartDashboard.putNumber("chosenTrigger", chosenTrigger);
     }
     
     //m_subsystem.getDifferentialDrive().arcadeDrive(-joystick.getX() * turbo, -joystick.getY() * turbo);

@@ -49,12 +49,10 @@ public class RobotContainer {
 
   CANSparkMax intake = new CANSparkMax(9, CANSparkMax.MotorType.kBrushless);
 
-  AnalogGyro gyro = new AnalogGyro(0);
-
   Joystick joystick = new Joystick(1);
   XboxController gamepad = new XboxController(0);
 
-  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, gyro, leftEncoder);
+  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, null, leftEncoder);
   ArmSubsystem armSubsystem = new ArmSubsystem(arm, armEncoder, armDownLockLeft, armDownLockRight);
   
   IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intake, solenoid);

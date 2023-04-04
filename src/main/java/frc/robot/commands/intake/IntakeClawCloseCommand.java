@@ -1,6 +1,7 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -27,7 +28,6 @@ public class IntakeClawCloseCommand extends CommandBase {
   @Override
   public void execute() {
     m_subsystem.getClawSolenoid().set(DoubleSolenoid.Value.kForward);
-    cancel();
   }
 
   // Called once the command ends or is interrupted.

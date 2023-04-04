@@ -31,8 +31,6 @@ public class ArmDownReleaseCommand extends CommandBase {
     m_subsystem.getArmDownLockRight().set(0);
 
     m_subsystem.lock = false;
-
-    SmartDashboard.putNumber("Gyro", 360);
   }
 
   // Called once the command ends or is interrupted.

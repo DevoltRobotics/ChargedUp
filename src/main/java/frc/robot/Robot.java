@@ -69,8 +69,6 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
-    m_robotContainer.gyro.calibrate();
-
     CameraServer.startAutomaticCapture();
     
     new ArmDownReleaseCommand(m_robotContainer.armSubsystem).schedule();
@@ -136,17 +134,34 @@ public class Robot extends TimedRobot {
           //new WaitCommand(0.5)
         //),
 
-        new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 14800, () -> 0.7),
+        new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 15100, () -> 0.7)
+      );
+
+      if(!selection.equals(kPonerCubo) && !selection.equals(kPonerCuboYBalanceoPaAtras)) {
+        autonomousCommand.addCommands(
+          new ParallelRaceGroup(
+            new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> 0.84, () -> 0.05),
+            new WaitCommand(2.0)
+          )
+        );
+      } else {
         new ParallelRaceGroup(
-          new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> 0.84, () -> 0.05),
-          new WaitCommand(2.0)
-        ),
+            new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> 0.12, () -> 0.02),
+            new WaitCommand(1)
+        );
+      }
+
+      autonomousCommand.addCommands(
         //new IntakeClawOpenCommand(m_robotContainer.intakeSubsystem),
         new ParallelRaceGroup(
           new IntakeReleaseCommand(m_robotContainer.intakeSubsystem),
           new WaitCommand(1.0)
-        ),
-        
+        )
+      );
+
+      
+      if(!selection.equals(kPonerCubo) && !selection.equals(kPonerCuboYBalanceoPaAtras)) {
+        autonomousCommand.addCommands(
         new ParallelRaceGroup(
           new IntakeRunCommand(m_robotContainer.intakeSubsystem, () -> 0),
 
@@ -161,7 +176,21 @@ public class Robot extends TimedRobot {
             )
           )
         )
-      );
+        );
+      } else {
+        autonomousCommand.addCommands(
+        new ParallelRaceGroup(
+          new IntakeRunCommand(m_robotContainer.intakeSubsystem, () -> 0),
+
+          new SequentialCommandGroup(
+            new ParallelRaceGroup(
+              new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> -1000, () -> 0.2),
+              new WaitCommand(3.8)
+            )
+          )
+        )
+        );
+      }
     }
 
     if(selection.equals(kConTodoPaDelante)) {
@@ -170,7 +199,7 @@ public class Robot extends TimedRobot {
       );
     } else if(selection.equals(kPonerCuboYConTodoPaDelante)) {
       autonomousCommand.addCommands(
-        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -2.1, () -> 0.03),
+        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -2.25, () -> 0.03),
         new ParallelRaceGroup(
           new DistanceTurnTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -0.88, () -> 0.04),
           new WaitCommand(3.0)
@@ -184,7 +213,7 @@ public class Robot extends TimedRobot {
       );
     } else if(selection.equals(kPonerCuboYBalanceoPaAtras)) {
       autonomousCommand.addCommands(
-        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -2.5, () -> 0.02)
+        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -1.5, () -> 0.031)
       );
     }
 

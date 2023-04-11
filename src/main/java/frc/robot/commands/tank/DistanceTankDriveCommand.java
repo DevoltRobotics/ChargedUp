@@ -29,13 +29,13 @@ public class DistanceTankDriveCommand extends CommandBase {
     controller.setSetpoint(distance.getAsDouble() * TankDriveSubsystem.ticksPerM);
     controller.setTolerance(800);
 
-    m_subsystem.getLeftEncoder().reset();
+    m_subsystem.getLeftEncoder().setPosition(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var power = controller.calculate(m_subsystem.getLeftEncoder().get()) * speed.getAsDouble();
+    var power = controller.calculate(m_subsystem.getLeftEncoder().getPosition()) * speed.getAsDouble();
 
     m_subsystem.getLeft().set(-power);
     m_subsystem.getRight().set(power);

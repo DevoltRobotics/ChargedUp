@@ -91,7 +91,8 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    SmartDashboard.putNumber("Drive Encoder", m_robotContainer.leftEncoder.get());
+    SmartDashboard.putNumber("Drive Encoder Left", m_robotContainer.tankDriveSubsystem.getLeftEncoder().getPosition());
+    SmartDashboard.putNumber("Drive Encoder Right", m_robotContainer.tankDriveSubsystem.getRightEncoder().getPosition());
     SmartDashboard.putNumber("Arm Encoder", m_robotContainer.armEncoder.get());
 
     SmartDashboard.putNumberArray("RobotDrive Motors", new double[]{m_robotContainer.left.get(), m_robotContainer.right.get(), m_robotContainer.left.get(), m_robotContainer.right.get()});

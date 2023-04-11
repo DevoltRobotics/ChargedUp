@@ -38,6 +38,8 @@ public class ArmDriveCommand extends CommandBase {
   public void execute() {
     if(Math.abs(speed.getAsDouble()) >= 0.1) {
       CommandScheduler.getInstance().schedule(new ArmDownReleaseCommand(m_subsystem));
+    }else{
+      new ArmDownLockCommand(m_subsystem).schedule();
     }
 
     var speedValue = speed.getAsDouble();

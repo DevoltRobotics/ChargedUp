@@ -27,8 +27,8 @@ public class ArmDownReleaseCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.getArmDownLockLeft().set(0.0);
-    m_subsystem.getArmDownLockRight().set(0);
+    m_subsystem.getArmDownLockLeft().set(1);
+    m_subsystem.getArmDownLockRight().set(1);
 
     m_subsystem.lock = false;
   }

@@ -51,7 +51,7 @@ public class ArcadeTankDriveCommand extends CommandBase {
           chosenTrigger = 0.5 - Math.abs(chosenTrigger / 2);
         }
 
-        turbo = 1.0 - chosenTrigger * 0.5;
+        turbo = 1.0;
 
 
         SmartDashboard.putNumber("turbo", turbo);

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -35,10 +37,16 @@ public class RobotContainer {
 
   DoubleSolenoid solenoid = new DoubleSolenoid(revPHId, PneumaticsModuleType.REVPH, 14, 15);
     
-  MotorControllerGroup left = new MotorControllerGroup(new CANSparkMax(3, CANSparkMax.MotorType.kBrushed), new CANSparkMax(4, CANSparkMax.MotorType.kBrushed));
-  MotorControllerGroup right = new MotorControllerGroup(new CANSparkMax(5, CANSparkMax.MotorType.kBrushed), new CANSparkMax(6, CANSparkMax.MotorType.kBrushed));
+  CANSparkMax leftA = new CANSparkMax(3, CANSparkMax.MotorType.kBrushless);
+  CANSparkMax leftB = new CANSparkMax(4, CANSparkMax.MotorType.kBrushless);
 
-  Encoder leftEncoder = new Encoder(0, 1);
+  CANSparkMax rightA = new CANSparkMax(5, CANSparkMax.MotorType.kBrushless);
+  CANSparkMax rightB = new CANSparkMax(6, CANSparkMax.MotorType.kBrushless);
+
+  MotorControllerGroup left = new MotorControllerGroup(leftA, leftB);
+  MotorControllerGroup right = new MotorControllerGroup(rightA, rightB);
+
+  AHRS gyro = new AHRS(SerialPort.Port.kUSB); 
 
   MotorControllerGroup arm = new MotorControllerGroup(new CANSparkMax(7, CANSparkMax.MotorType.kBrushed), new CANSparkMax(8, CANSparkMax.MotorType.kBrushed));
 
@@ -52,7 +60,7 @@ public class RobotContainer {
   Joystick joystick = new Joystick(1);
   XboxController gamepad = new XboxController(0);
 
-  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, null, leftEncoder);
+  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, leftA.getEncoder(), rightA.getEncoder(), gyro);
   ArmSubsystem armSubsystem = new ArmSubsystem(arm, armEncoder, armDownLockLeft, armDownLockRight);
   
   IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intake, solenoid);

@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TankDriveSubsystem extends SubsystemBase {
@@ -24,8 +26,13 @@ public class TankDriveSubsystem extends SubsystemBase {
 
   private DifferentialDrive drive;
 
-  private DifferentialDriveOdometry localizer = new DifferentialDriveOdometry(getRotation2d(), getLeftDistance(), getRightDistance());
+  private double ratio = 1 / 10.75;
+  private double wheelDiameterMeters = (6 * 2.54) / 100;
+
+  private DifferentialDriveOdometry localizer = null;
   private Pose2d lastPose = new Pose2d();
+
+  private final Field2d field = new Field2d();
 
   public static int ticksPerRev = 8192;
   public static double wheelDiameter = 16 * 2.54;
@@ -39,13 +46,29 @@ public class TankDriveSubsystem extends SubsystemBase {
     this.right = right;
     this.gyro = gyro;
 
+    left.setInverted(true);
+    right.setInverted(true);
+
     this.leftEncoder = leftEncoder;
+    leftEncoder.setPosition(0);
+
     this.rightEncoder = rightEncoder;
+    rightEncoder.setPosition(0);
+
+    gyro.calibrate();
+
+    SmartDashboard.putData("Field", field);
+
+    localizer = new DifferentialDriveOdometry(getRotation2d(), getLeftDistance(), getRightDistance());
   }
 
   @Override
   public void periodic() {
     lastPose = localizer.update(getRotation2d(), getLeftDistance(), getRightDistance());
+
+    field.setRobotPose(lastPose);
+
+    SmartDashboard.putNumber("Gyro", gyro.getAngle());
   }
 
   @Override
@@ -72,16 +95,24 @@ public class TankDriveSubsystem extends SubsystemBase {
     return leftEncoder;
   }
 
+  public double getLeftRevs() {
+    return leftEncoder.getPosition() * ratio;
+  }
+
   public double getLeftDistance() {
-    return (leftEncoder.getPosition() / leftEncoder.getCountsPerRevolution());
+    return getLeftRevs() * wheelDiameterMeters * Math.PI;
   }
   
   public RelativeEncoder getRightEncoder() {
     return rightEncoder;
   }
 
+  public double getRightRevs() {
+    return -rightEncoder.getPosition() * ratio;
+  }
+  
   public double getRightDistance() {
-    return (leftEncoder.getPosition() / leftEncoder.getCountsPerRevolution());
+    return getRightRevs() * wheelDiameterMeters * Math.PI;
   }
 
   public Pose2d getLastPose() {
@@ -93,14 +124,26 @@ public class TankDriveSubsystem extends SubsystemBase {
   }
 
   public Rotation2d getRotation2d() {
-    return gyro.getRotation2d();
+    try {
+      return gyro.getRotation2d();
+    } catch(Exception ex) {
+      return Rotation2d.fromDegrees(0);
+    }
   }
 
   public double getDrivetrainAngle() {
-    return gyro.getAngle();
+    try {
+      return gyro.getAngle();
+    } catch(Exception ex) {
+      return 0;
+    }
   }
   
   public double getForwardTiltAngle() {
-    return gyro.getPitch();
+    try {
+      return gyro.getPitch();
+    } catch(Exception ex) {
+      return 0;
+    }
   }
 }

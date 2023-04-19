@@ -6,23 +6,20 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.arm.ArmDownReleaseCommand;
 
 public class ArmSubsystem extends SubsystemBase {
 
   private MotorController arm;
   private Encoder encoder;
-  private Servo armDownLockLeft;
-  private Servo armDownLockRight;
+  private Servo armDownLock;
 
   public boolean lock = true;
 
   /** Creates a new TankDriveSubsystem. */
-  public ArmSubsystem(MotorController arm, Encoder encoder, Servo armDownLockLeft, Servo armDownLockRight) {
+  public ArmSubsystem(MotorController arm, Encoder encoder, Servo armDownLock) {
     this.arm = arm;
     this.encoder = encoder;
-    this.armDownLockLeft = armDownLockLeft;
-    this.armDownLockRight = armDownLockRight;
+    this.armDownLock = armDownLock;
   }
 
   @Override
@@ -38,12 +35,8 @@ public class ArmSubsystem extends SubsystemBase {
     return arm;
   }
   
-  public Servo getArmDownLockLeft() {
-    return armDownLockLeft;
-  }
-  
-  public Servo getArmDownLockRight() {
-    return armDownLockRight;
+  public Servo getArmDownLock() {
+    return armDownLock;
   }
 
   public Encoder getEncoder() {

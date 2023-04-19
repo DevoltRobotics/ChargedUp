@@ -50,18 +50,17 @@ public class RobotContainer {
 
   MotorControllerGroup arm = new MotorControllerGroup(new CANSparkMax(7, CANSparkMax.MotorType.kBrushed), new CANSparkMax(8, CANSparkMax.MotorType.kBrushed));
 
-  Servo armDownLockLeft = new Servo(8);
-  Servo armDownLockRight = new Servo(9);
+  Servo armDownLock = new Servo(9);
 
   Encoder armEncoder = new Encoder(2, 3);
 
-  CANSparkMax intake = new CANSparkMax(9, CANSparkMax.MotorType.kBrushless);
+  CANSparkMax intake = new CANSparkMax(9, CANSparkMax.MotorType.kBrushed);
 
   Joystick joystick = new Joystick(1);
   XboxController gamepad = new XboxController(0);
 
-  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, leftA.getEncoder(), rightA.getEncoder(), gyro);
-  ArmSubsystem armSubsystem = new ArmSubsystem(arm, armEncoder, armDownLockLeft, armDownLockRight);
+  TankDriveSubsystem tankDriveSubsystem = new TankDriveSubsystem(left, right, leftB.getEncoder(), rightA.getEncoder(), gyro);
+  ArmSubsystem armSubsystem = new ArmSubsystem(arm, armEncoder, armDownLock);
   
   IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intake, solenoid);
 

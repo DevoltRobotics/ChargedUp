@@ -22,11 +22,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(clawSolenoid.get() == DoubleSolenoid.Value.kForward) {
-      SmartDashboard.putNumber("Gyro", 360);
-    } else {
-      SmartDashboard.putNumber("Gyro", 180);
-    }
   }
 
   @Override

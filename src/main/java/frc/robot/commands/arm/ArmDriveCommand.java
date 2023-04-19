@@ -36,12 +36,6 @@ public class ArmDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(Math.abs(speed.getAsDouble()) >= 0.1) {
-      CommandScheduler.getInstance().schedule(new ArmDownReleaseCommand(m_subsystem));
-    }else{
-      new ArmDownLockCommand(m_subsystem).schedule();
-    }
-
     var speedValue = speed.getAsDouble();
     
     if(speedValue < 0 && m_subsystem.getEncoder().get() <= -100) {

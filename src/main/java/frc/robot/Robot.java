@@ -24,16 +24,17 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.tank.ArcadeTankDriveCommand;
+import frc.robot.commands.tank.AutoBalancingTankDriveCommand;
 import frc.robot.commands.tank.DistanceTankDriveCommand;
 import frc.robot.commands.tank.DistanceTurnTankDriveCommand;
 import frc.robot.commands.TogglingCommand;
-import frc.robot.commands.arm.ArmDownLockCommand;
-import frc.robot.commands.arm.ArmDownReleaseCommand;
 import frc.robot.commands.arm.ArmDriveCommand;
 import frc.robot.commands.arm.ArmGoToPositionCommand;
 import frc.robot.commands.intake.IntakeClawCloseCommand;
 import frc.robot.commands.intake.IntakeClawOpenCommand;
 import frc.robot.commands.intake.IntakeGrabCommand;
+import frc.robot.commands.intake.IntakeHoldConeCommand;
+import frc.robot.commands.intake.IntakeHoldCubeCommand;
 import frc.robot.commands.intake.IntakeNZRunCommand;
 import frc.robot.commands.intake.IntakeReleaseCommand;
 import frc.robot.commands.intake.IntakeRunCommand;
@@ -70,8 +71,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     CameraServer.startAutomaticCapture();
-    
-    new ArmDownReleaseCommand(m_robotContainer.armSubsystem).schedule();
 
     SmartDashboard.putStringArray("Auto List", new String[]{kConTodoPaDelante, kBalanceoPaDelante, kPonerCubo, kPonerCuboYConTodoPaDelante, kPonerCuboYBalanceoPaAtras});
   }
@@ -91,8 +90,12 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    SmartDashboard.putNumber("Drive Encoder Left", m_robotContainer.tankDriveSubsystem.getLeftEncoder().getPosition());
-    SmartDashboard.putNumber("Drive Encoder Right", m_robotContainer.tankDriveSubsystem.getRightEncoder().getPosition());
+    SmartDashboard.putNumber("Drive Encoder Left", m_robotContainer.tankDriveSubsystem.getLeftRevs());
+    SmartDashboard.putNumber("Drive Encoder Right", m_robotContainer.tankDriveSubsystem.getRightRevs());
+
+    SmartDashboard.putNumber("Drive Distance Left", m_robotContainer.tankDriveSubsystem.getLeftDistance());
+    SmartDashboard.putNumber("Drive Distance Right", m_robotContainer.tankDriveSubsystem.getRightDistance());
+
     SmartDashboard.putNumber("Arm Encoder", m_robotContainer.armEncoder.get());
 
     SmartDashboard.putNumberArray("RobotDrive Motors", new double[]{m_robotContainer.left.get(), m_robotContainer.right.get(), m_robotContainer.left.get(), m_robotContainer.right.get()});
@@ -208,13 +211,13 @@ public class Robot extends TimedRobot {
       );
     } else if(selection.equals(kBalanceoPaDelante)) {
       autonomousCommand.addCommands(
-        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> 2.5, () -> 0.01),
-        new WaitCommand(1.0),
-        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -1.5, () -> 0.01)
+        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> 15, () -> 0.3),
+        new AutoBalancingTankDriveCommand(m_robotContainer.tankDriveSubsystem, -0.3, () -> 0.4)
       );
     } else if(selection.equals(kPonerCuboYBalanceoPaAtras)) {
       autonomousCommand.addCommands(
-        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -1.5, () -> 0.031)
+        new DistanceTankDriveCommand(m_robotContainer.tankDriveSubsystem, () -> -15, () -> 0.3),
+        new AutoBalancingTankDriveCommand(m_robotContainer.tankDriveSubsystem, 0.3, () -> 0.4)
       );
     }
 
@@ -232,7 +235,10 @@ public class Robot extends TimedRobot {
     new ArcadeTankDriveCommand(m_robotContainer.tankDriveSubsystem, m_robotContainer.joystick, true).schedule();
     m_robotContainer.armSubsystem.setDefaultCommand(new ArmDriveCommand(m_robotContainer.armSubsystem, () -> -m_robotContainer.gamepad.getLeftY()));
 
-    new IntakeClawOpenCommand(m_robotContainer.intakeSubsystem).schedule();
+    new IntakeClawCloseCommand(m_robotContainer.intakeSubsystem).schedule();
+
+    Trigger leftTriggerButton = new Trigger(() -> m_robotContainer.gamepad.getLeftTriggerAxis() > 0.1);
+    Trigger rightTriggerButton = new Trigger(() -> m_robotContainer.gamepad.getRightTriggerAxis() > 0.1);
 
     Trigger aButton = new Trigger(() -> m_robotContainer.gamepad.getAButton());
     Trigger bButton = new Trigger(() -> m_robotContainer.gamepad.getBButton());
@@ -246,20 +252,25 @@ public class Robot extends TimedRobot {
 
     aButton
       .onTrue(new IntakeGrabCommand(m_robotContainer.intakeSubsystem))
-      .onFalse(new IntakeStopCommand(m_robotContainer.intakeSubsystem));
+      .onFalse(new IntakeHoldConeCommand(m_robotContainer.intakeSubsystem));
 
     bButton
       .onTrue(new IntakeReleaseCommand(m_robotContainer.intakeSubsystem))
+      .onFalse(new IntakeHoldCubeCommand(m_robotContainer.intakeSubsystem));
+
+    leftTriggerButton
+      .onTrue(new IntakeHoldConeCommand(m_robotContainer.intakeSubsystem))
       .onFalse(new IntakeStopCommand(m_robotContainer.intakeSubsystem));
 
-    xButton
-      .onTrue(new TogglingCommand(new ArmDownLockCommand(m_robotContainer.armSubsystem), new ArmDownReleaseCommand(m_robotContainer.armSubsystem)));
+    rightTriggerButton
+        .onTrue(new IntakeHoldCubeCommand(m_robotContainer.intakeSubsystem))
+        .onFalse(new IntakeStopCommand(m_robotContainer.intakeSubsystem));
 
-    yButton.onTrue(new TogglingCommand(new IntakeClawOpenCommand(m_robotContainer.intakeSubsystem), new IntakeClawCloseCommand(m_robotContainer.intakeSubsystem)));
+    yButton.onTrue(new TogglingCommand(new IntakeClawCloseCommand(m_robotContainer.intakeSubsystem), new IntakeClawOpenCommand(m_robotContainer.intakeSubsystem)));
 
-    armAutoUpButton.onTrue(new ArmDownReleaseCommand(m_robotContainer.armSubsystem).andThen(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 14000)));
-    armAutoMiddleButton.onTrue(new ArmDownReleaseCommand(m_robotContainer.armSubsystem).andThen(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 8000)));
-    armAutoSaveButton.onTrue(new ArmDownReleaseCommand(m_robotContainer.armSubsystem).andThen(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 100, () -> 0.2)));
+    armAutoUpButton.onTrue(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 14000));
+    armAutoMiddleButton.onTrue(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 8000));
+    armAutoSaveButton.onTrue(new ArmGoToPositionCommand(m_robotContainer.armSubsystem, () -> 100, () -> 0.2));
   }
 
   /** This function is called periodically during operator control. */
@@ -269,6 +280,16 @@ public class Robot extends TimedRobot {
 
     if(m_robotContainer.joystick.getPOV() != -1 && m_robotContainer.armSubsystem.getCurrentCommand() != m_robotContainer.armSubsystem.getDefaultCommand()) {
       m_robotContainer.armSubsystem.getCurrentCommand().cancel();
+    }
+
+    SmartDashboard.putNumber("left y", m_robotContainer.gamepad.getLeftY());
+
+    if(-m_robotContainer.gamepad.getLeftY() > 0.1) {
+      m_robotContainer.armSubsystem.getArmDownLock().set(0.45);
+      SmartDashboard.putBoolean("servo", true);
+    } else {
+      m_robotContainer.armSubsystem.getArmDownLock().set(0.8);
+      SmartDashboard.putBoolean("servo", false);
     }
   }
 

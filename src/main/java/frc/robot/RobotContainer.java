@@ -35,7 +35,7 @@ public class RobotContainer {
 
   int revPHId = 2;
 
-  DoubleSolenoid solenoid = new DoubleSolenoid(revPHId, PneumaticsModuleType.REVPH, 14, 15);
+  DoubleSolenoid solenoid = new DoubleSolenoid(revPHId, PneumaticsModuleType.REVPH, 0, 1);
     
   CANSparkMax leftA = new CANSparkMax(3, CANSparkMax.MotorType.kBrushless);
   CANSparkMax leftB = new CANSparkMax(4, CANSparkMax.MotorType.kBrushless);
@@ -47,6 +47,8 @@ public class RobotContainer {
   MotorControllerGroup right = new MotorControllerGroup(rightA, rightB);
 
   AHRS gyro = new AHRS(SerialPort.Port.kUSB); 
+
+  AHRS aaa = new AHRS(SerialPort.Port.kUSB)
 
   MotorControllerGroup arm = new MotorControllerGroup(new CANSparkMax(7, CANSparkMax.MotorType.kBrushed), new CANSparkMax(8, CANSparkMax.MotorType.kBrushed));
 
